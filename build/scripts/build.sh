@@ -361,7 +361,7 @@ if [[ $PUBLISH_ARTIFACTS_TO_RCM -eq 1 ]]; then
     done
 
     # copy files to rcm-guest
-    ssh "${DESTHOST}" "cd /mnt/rcm-guest/staging/devspaces && mkdir -p devspaces-${CSV_VERSION}/ && ls -la . "
+    ssh -K "crw-build@${DESTHOST}" "cd /mnt/rcm-guest/staging/devspaces && mkdir -p devspaces-${CSV_VERSION}/ && ls -la . "
     rsync -zrlt --rsh=ssh --protocol=28 --exclude "dsc*.tar.gz" --exclude "*-quay-*.tar.gz" \
     ${DSC_DIR}/dist/channels/redhat/*gz \
     ${WORKSPACE}/${mnt}-ssh/devspaces-${CSV_VERSION}/
@@ -369,13 +369,13 @@ if [[ $PUBLISH_ARTIFACTS_TO_RCM -eq 1 ]]; then
     # clone files so we have a dsc3 version too
     # devspaces-3.y.z-GA-dsc-linux-x64.tar.gz -> devspaces-3.y.z-GA-dsc3-linux-x64.tar.gz
     # DO NOT INCLUDE the -quay- versions!
-    ssh "${DESTHOST}" "cd /mnt/rcm-guest/staging/devspaces/devspaces-${CSV_VERSION}/ && for d in ${TARBALL_PREFIX}-dsc-*; do cp \$d \${d/dsc-/dsc3-}; done" || true
+    ssh -K "crw-build@${DESTHOST}" "cd /mnt/rcm-guest/staging/devspaces/devspaces-${CSV_VERSION}/ && for d in ${TARBALL_PREFIX}-dsc-*; do cp \$d \${d/dsc-/dsc3-}; done" || true
 
     # echo what we have on disk
-    ssh "${DESTHOST}" "cd /mnt/rcm-guest/staging/devspaces/devspaces-${CSV_VERSION}/ && ls -la ${TARBALL_PREFIX}*" || true
+    ssh -K "crw-build@${DESTHOST}" "cd /mnt/rcm-guest/staging/devspaces/devspaces-${CSV_VERSION}/ && ls -la ${TARBALL_PREFIX}*" || true
 
     # trigger release
-    ssh "${DESTHOST}" "/mnt/redhat/scripts/rel-eng/utility/bus-clients/stage-mw-release devspaces-${CSV_VERSION}" || true
+    ssh -K "crw-build@${DESTHOST}" "/mnt/redhat/scripts/rel-eng/utility/bus-clients/stage-mw-release devspaces-${CSV_VERSION}" || true
 
     # drop connection to remote host so Jenkins cleanup won't delete files we just created
     fusermount -uz ${WORKSPACE}/RCMG-ssh || true
