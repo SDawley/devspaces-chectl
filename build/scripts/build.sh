@@ -288,48 +288,6 @@ if [[ $DO_QUAY_BUILD -eq 1 ]]; then
     popd >/dev/null 
 fi
 
-:'
-if [[ $PUBLISH_ARTIFACTS_TO_GITHUB -eq 1 ]]; then
-    ########################################################################
-    echo "[INFO] 4. Publish to GH"
-    ########################################################################
-
-    # requires hub cli
-    if [[ ! -x /tmp/uploadAssetsToGHRelease.sh ]]; then 
-        pushd /tmp/ >/dev/null
-        curl -sSLO "https://raw.githubusercontent.com/redhat-developer/codeready-workspaces/${MIDSTM_BRANCH}/product/uploadAssetsToGHRelease.sh" && \
-        chmod +x uploadAssetsToGHRelease.sh
-        popd >/dev/null
-    fi
-
-    # delete existing CI pre-release and replace it, so timestamp is fresh
-    if [[ $releaseName == "crwctl-CI" ]] || [[ $PRE_RELEASE == "--prerelease" ]]; then # CI build
-        /tmp/uploadAssetsToGHRelease.sh ${PRE_RELEASE} --delete-assets -v "${CSV_VERSION}" -b "${MIDSTM_BRANCH}" --asset-name "${releaseName}"
-    fi
-
-    # in case API is running slow, sleep for a bit before trying to push files into the freshly created release
-    sleep 10s
-
-    # upload artifacts for each platform + sources tarball
-    for channel in quay redhat; do 
-        pushd ${CRWCTL_DIR}/dist/channels/${channel}/
-            echo "[INFO] Publish $channel assets to ${CSV_VERSION}-${releaseName}-assets GH release"
-            /tmp/uploadAssetsToGHRelease.sh ${PRE_RELEASE} --publish-assets -v "${CSV_VERSION}" -b "${MIDSTM_BRANCH}" --asset-name "${releaseName}" "codeready-workspaces-*tar.gz"
-        popd >/dev/null
-        echo "[INFO] Published assets: https://github.com/redhat-developer/codeready-workspaces-chectl/releases/tag/${CSV_VERSION}-${releaseName}-assets"
-    done
-
-    # cleanup
-    rm -f /tmp/uploadAssetsToGHRelease.sh
-
-    echo "[INFO] Refresh GH pages"
-    pushd ${CRWCTL_DIR} >/dev/null
-        git clone https://devstudio-release:${GITHUB_TOKEN}@github.com/redhat-developer/codeready-workspaces-chectl -b gh-pages --single-branch gh-pages && cd gh-pages
-        echo $(date +%s) > update && git add update && git commit -m "ci: [update] add $RELEASE_ID to github pages" && git push origin gh-pages
-    popd >/dev/null
-fi
-'
-
 if [[ $PUBLISH_ARTIFACTS_TO_RCM -eq 1 ]]; then
     ########################################################################
     echo "[INFO] 5. Publish to RCM"
