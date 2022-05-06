@@ -304,6 +304,7 @@ if [[ $PUBLISH_ARTIFACTS_TO_RCM -eq 1 ]]; then
     " >> ~/.ssh/known_hosts
 
     # edit config
+    echo "GSSAPIAuthentication yes" >> ~/.ssh/config
     echo "GSSAPIDelegateCredentials yes" >> ~/.ssh/config
 
     # if no kerb ticket for crw-build user, attempt to create one
