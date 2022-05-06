@@ -307,6 +307,8 @@ if [[ $PUBLISH_ARTIFACTS_TO_RCM -eq 1 ]]; then
     echo "GSSAPIAuthentication yes" >> ~/.ssh/config
     echo "GSSAPIDelegateCredentials yes" >> ~/.ssh/config
 
+    cat ~/.ssh/config
+
     # if no kerb ticket for crw-build user, attempt to create one
     if [[ ! $(klist | grep crw-build) ]]; then
         cat /etc/redhat-release
