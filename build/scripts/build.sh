@@ -303,6 +303,9 @@ if [[ $PUBLISH_ARTIFACTS_TO_RCM -eq 1 ]]; then
     echo "rcm-guest.app.eng.bos.redhat.com,10.16.101.129 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEApd6cnyFVRnS2EFf4qeNvav0o+xwd7g7AYeR9dxzJmCR3nSoVHA4Q/kV0qvWkyuslvdA41wziMgSpwq6H/DPLt41RPGDgJ5iGB5/EDo3HAKfnFmVAXzYUrJSrYd25A1eUDYHLeObtcL/sC/5bGPp/0deohUxLtgyLya4NjZoYPQY8vZE6fW56/CTyTdCEWohDRUqX76sgKlVBkYVbZ3uj92GZ9M88NgdlZk74lOsy5QiMJsFQ6cpNw+IPW3MBCd5NHVYFv/nbA3cTJHy25akvAwzk8Oi3o9Vo0Z4PSs2SsD9K9+UvCfP1TUTI4PXS8WpJV6cxknprk0PSIkDdNODzjw==
     " >> ~/.ssh/known_hosts
 
+    # edit config
+    echo "GSSAPIDelegateCredentials yes" >> ~/.ssh/config
+
     # if no kerb ticket for crw-build user, attempt to create one
     if [[ ! $(klist | grep crw-build) ]]; then
         cat /etc/redhat-release
